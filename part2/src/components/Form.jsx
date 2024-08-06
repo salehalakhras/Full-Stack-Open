@@ -1,17 +1,31 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
+import personsAPI from '../services/personsAPI';
 
 const Form = ({ personsState, setPersonsState }) => {
     const [newName, setNewName] = useState({
         name: '',
-        number: ''
+        number: '',
       })
 
     const handleSubmit = (event) => {
         event.preventDefault()
         if(personsState.find((p) => p.name === newName.name))
-          alert(newName.name + ' already exists');
+            if(confirm(`${newName.name} already exists do you want to update the number?`)){
+                const updatedPerson = {
+                    ...personsState.find((p) => p.name === newName.name),
+                    number: newName.number
+                }
+                personsAPI.update(updatedPerson.id ,updatedPerson)
+                .then(response => {
+                    setPersonsState(personsState.map((p) => p.id === response.id? response : p));
+                })
+            }
         else
-        setPersonsState(personsState.concat(newName))
+            personsAPI.create(newName)
+            .then(response => {
+                setPersonsState(personsState.concat(response));
+            })
+
         setNewName({
           name: '',
           number: '' 
