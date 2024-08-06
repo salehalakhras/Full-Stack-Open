@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import personsAPI from '../services/personsAPI';
 
-const Form = ({ personsState, setPersonsState }) => {
+const Form = ({ personsState, setPersonsState, setStatusBar }) => {
     const [newName, setNewName] = useState({
         name: '',
         number: '',
@@ -9,7 +9,7 @@ const Form = ({ personsState, setPersonsState }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        if(personsState.find((p) => p.name === newName.name))
+        if(personsState.find((p) => p.name === newName.name)){
             if(confirm(`${newName.name} already exists do you want to update the number?`)){
                 const updatedPerson = {
                     ...personsState.find((p) => p.name === newName.name),
@@ -18,13 +18,17 @@ const Form = ({ personsState, setPersonsState }) => {
                 personsAPI.update(updatedPerson.id ,updatedPerson)
                 .then(response => {
                     setPersonsState(personsState.map((p) => p.id === response.id? response : p));
+                    setStatusBar(`${newName.name} number updated`);
                 })
             }
-        else
+        }
+        else{
             personsAPI.create(newName)
             .then(response => {
                 setPersonsState(personsState.concat(response));
+                setStatusBar(`${newName.name} with number: ${newName.number} added.`)
             })
+        }
 
         setNewName({
           name: '',
