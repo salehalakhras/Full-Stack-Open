@@ -6,7 +6,7 @@ import personsAPI from './services/personsAPI';
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  const [shownPersons, setShownPersons] = useState(persons);
+  const [shownPersons, setShownPersons] = useState([]);
   const [statusBar, setStatusBar] = useState('');
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const App = () => {
   }, [statusBar])
 
   const statusBarStyle = {
-    color: statusBar.includes('Info:')? 'red' : 'green',
+    color: statusBar.includes('Info:') ? 'red' : 'green',
     backgroundColor: 'lightgray',
     padding: '10px',
     marginBottom: '10px',
@@ -48,7 +48,7 @@ const App = () => {
       <h2>Add a new</h2>
       <Form personsState={persons} setPersonsState={setPersons} setStatusBar={setStatusBar}></Form>
       <h2>Numbers</h2>
-      <Persons persons={shownPersons} setPersons={setPersons} setStatusBar={setStatusBar}></Persons>
+      {shownPersons.length? <Persons persons={shownPersons} setPersons={setPersons} setStatusBar={setStatusBar}></Persons>: <div>No contacts found</div>}
     </div>
   )
 }
