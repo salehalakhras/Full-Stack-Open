@@ -1,7 +1,13 @@
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
 
+morgan.token('body', request => {
+  return JSON.stringify(request.body)
+})
+
 app.use(express.json());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 let presons = [
   {
@@ -27,40 +33,40 @@ let presons = [
 ];
 
 // get all
-app.get('/api/persons', (resquest, response) => {
+app.get('/api/persons', (request, response) => {
   response.json(presons);
 })
 
 // get information
-app.get('/info/', (resquest, response) => {
+app.get('/info/', (request, response) => {
   response.send(`<div>Phonebook has info for ${presons.length} people</div> <div>${new Date().toString()}</div>`);
 })
 
 // get by id
-app.get('/api/persons/:id', (resquest, response) => {
-  const person = presons.find(p => p.id === resquest.params.id);
+app.get('/api/persons/:id', (request, response) => {
+  const person = presons.find(p => p.id === request.params.id);
   if (person) {
     response.json(person);
   } else {
-    response.status(404).send(`Person with id ${resquest.params.id} not found`);
+    response.status(404).send(`Person with id ${request.params.id} not found`);
   }
 })
 
 // delete by id
-app.delete('/api/persons/:id', (resquest, response) => {
-  const person = presons.find(p => p.id === resquest.params.id);
+app.delete('/api/persons/:id', (request, response) => {
+  const person = presons.find(p => p.id === request.params.id);
   if (person) {
     response.json(person);
-    presons = presons.filter(p => p.id !== resquest.params.id);
+    presons = presons.filter(p => p.id !== request.params.id);
     response.status(204).end();
   } else {
-    response.status(404).send(`Person with id ${resquest.params.id} not found`);
+    response.status(404).send(`Person with id ${request.params.id} not found`);
   }
 })
 
 // post
-app.post('/api/persons', (resquest, response) => {
-  const body = resquest.body;
+app.post('/api/persons', (request, response) => {
+  const body = request.body;
   if (!body.name || !body.number) {
     return response.status(400).send('name or number missing');
   }
@@ -74,6 +80,7 @@ app.post('/api/persons', (resquest, response) => {
   };
   presons = presons.concat(person);
   response.json(person);
+
 })
 
 const PORT = 3001;
